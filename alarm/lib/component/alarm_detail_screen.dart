@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 
 class AlarmDetailScreen extends StatelessWidget {
   final DateTime dateTime;
+  final Function(DateTime) onTimeChanged;
+  final Function onTimeDeleted;
 
   const AlarmDetailScreen({
     super.key,
     required this.dateTime,
+    required this.onTimeChanged,
+    required this.onTimeDeleted,
   });
 
   @override
@@ -18,7 +22,11 @@ class AlarmDetailScreen extends StatelessWidget {
           showModalBottomSheet(
             context: context,
             builder: (context) {
-              return AlarmBottomSheet(dateTime: dateTime);
+              return AlarmBottomSheet(
+                dateTime: dateTime,
+                onTimeChanged: onTimeChanged,
+                onTimeDeleted: onTimeDeleted,
+              );
             },
           );
         },

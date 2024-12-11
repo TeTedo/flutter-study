@@ -13,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final controller = ScrollController();
   bool isHideFloatingButton = false;
+  final List<DateTime> alarmList = [];
 
   @override
   void initState() {
@@ -32,13 +33,26 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void updateAlarm(DateTime newDateTime, int index) {
+    setState(() {
+      alarmList[index] = newDateTime;
+    });
+  }
+
+  void deleteAlarm(int index) {
+    setState(() {
+      alarmList.removeAt(index);
+    });
+  }
+
+  void addAlarm(DateTime newDateTime) {
+    setState(() {
+      alarmList.add(newDateTime);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<DateTime> alarmList = List.generate(
-      30,
-      (index) => DateTime.now().add(Duration(minutes: index)),
-    );
-
     return DefaultLayout(
       title: '알람',
       child: ListView.separated(
@@ -55,12 +69,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
           return AlarmDetailScreen(
             dateTime: alarmList[index],
+            onTimeChanged: (newDateTime) => updateAlarm(newDateTime, index),
+            onTimeDeleted: () => deleteAlarm(index),
           );
         },
         itemCount: alarmList.length + 1,
       ),
-      floatingActionButton:
-          isHideFloatingButton ? null : AddAlarmFloatingButton(),
+      floatingActionButton: isHideFloatingButton
+          ? null
+          : AddAlarmFloatingButton(
+              onTimeAdded: (newDateTime) => addAlarm(newDateTime),
+            ),
     );
   }
 }
