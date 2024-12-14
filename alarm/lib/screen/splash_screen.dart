@@ -10,33 +10,37 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // AppLifecycleState 관찰 추가
     requestNotificationPermission();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // 관찰 제거
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // 앱이 포그라운드로 돌아올 때 권한 확인
+    if (state == AppLifecycleState.resumed) {
+      checkPermissionStatus();
+    }
   }
 
   Future<void> requestNotificationPermission() async {
     // 권한 요청 실행
-    final notificationStatus = await Permission.notification.status;
+    final status = await Permission.notification.request();
 
-    print(notificationStatus);
+    print(status);
 
-    if (await Permission.notification.isDenied) {
-      PermissionStatus status = await Permission.notification.request();
-
-      print(status);
-
-      if (status.isGranted) {
-        // 권한이 허용되면 HomeScreen으로 이동
-        navigateToHome();
-      } else {
-        // 권한이 거부되면 재요청 버튼 표시
-        setState(() {});
-      }
-    } else {
-      // 권한이 이미 허용된 경우 바로 HomeScreen으로 이동
+    if (status != PermissionStatus.permanentlyDenied &&
+        status != PermissionStatus.denied) {
       navigateToHome();
     }
   }
@@ -48,6 +52,21 @@ class _SplashScreenState extends State<SplashScreen> {
         builder: (_) => HomeScreen(),
       ),
     );
+  }
+
+  /// 권한 상태 확인
+  Future<void> checkPermissionStatus() async {
+    final status = await Permission.notification.status;
+    print("현재 권한 상태: $status");
+
+    if (status == PermissionStatus.granted) {
+      navigateToHome(); // 권한이 허용되면 HomeScreen으로 이동
+    }
+  }
+
+  void requestPermissionAgain() {
+    // 권한 요청 실행
+    openAppSettings();
   }
 
   @override
@@ -76,6 +95,10 @@ class _SplashScreenState extends State<SplashScreen> {
                 );
               },
               child: Text('알람 시작하기~'),
+            ),
+            ElevatedButton(
+              onPressed: requestPermissionAgain,
+              child: Text('알람 권한 재요청'),
             ),
           ],
         ),

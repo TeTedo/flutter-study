@@ -45,7 +45,7 @@ post_install do |installer|
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
         '$(inherited)',
 
-        ## 알림 권한
+        # 알림 권한
         'PERMISSION_NOTIFICATIONS=1',
 
       ]

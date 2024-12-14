@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "example.alarm.alarm"
-    compileSdkVersion 33
+    compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
